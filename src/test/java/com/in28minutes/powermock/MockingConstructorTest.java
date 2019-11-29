@@ -3,6 +3,7 @@ package com.in28minutes.powermock;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -18,45 +19,34 @@ import org.mockito.junit.MockitoRule;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.powermock.reflect.Whitebox;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(UtilityClass.class)
-public class MockingStaticMethodTest {
+@PrepareForTest(SystemUnderTest.class)
+public class MockingConstructorTest {
 	
-	//Specific Runner (when it uses Mockito and PowerMock)
-	//Initialize UtilityClass.class
+	//PrepareForTest => SystemUnderTest.class
+	//oerrride the constructor
 	
-	@Rule
-	public MockitoRule mockitoRule = MockitoJUnit.rule(); 
-
-	@Mock
-	Dependency dependency;
-
 	@InjectMocks
 	SystemUnderTest systemUnderTest;
 	
-	@Captor
-	ArgumentCaptor<String> stringArgumentCaptor;
-
-	// TodoBusinessImpl todoBusinessImpl = new TodoBusinessImpl(todoServiceMock);
-
+	@Mock
+	ArrayList mockList;
+	
 	@Test
-	public void testRetrieveTodosRelatedToSpring_usingAMock() {
+	public void testBadNames() throws Exception {
 
 		List<Integer> stats = Arrays.asList(1,2,3);
+		
+		when(mockList.size()).thenReturn(5);
+		
+		PowerMockito.whenNew(ArrayList.class).withAnyArguments().thenReturn(mockList);
+		
+		int size = systemUnderTest.methodUsingAnArrayListConstructor();
+		
+		assertEquals(5, size);
 
-		when(dependency.retrieveAllStats()).thenReturn(stats);
-		
-		PowerMockito.mockStatic(UtilityClass.class);
-
-		when(UtilityClass.staticMethod(6)).thenReturn(150);
-		
-		int result = systemUnderTest.methodCallingAStaticMethod();
-		
-		assertEquals(150, result);
-		
-		PowerMockito.verifyStatic();
-		UtilityClass.staticMethod(6);
 		
 	}
 

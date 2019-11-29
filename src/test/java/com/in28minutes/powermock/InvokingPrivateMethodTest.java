@@ -18,17 +18,12 @@ import org.mockito.junit.MockitoRule;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.powermock.reflect.Whitebox;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(UtilityClass.class)
-public class MockingStaticMethodTest {
+public class InvokingPrivateMethodTest {
 	
-	//Specific Runner (when it uses Mockito and PowerMock)
-	//Initialize UtilityClass.class
-	
-	@Rule
-	public MockitoRule mockitoRule = MockitoJUnit.rule(); 
-
 	@Mock
 	Dependency dependency;
 
@@ -38,25 +33,17 @@ public class MockingStaticMethodTest {
 	@Captor
 	ArgumentCaptor<String> stringArgumentCaptor;
 
-	// TodoBusinessImpl todoBusinessImpl = new TodoBusinessImpl(todoServiceMock);
-
 	@Test
-	public void testRetrieveTodosRelatedToSpring_usingAMock() {
+	public void testRetrieveTodosRelatedToSpring_usingAMock() throws Exception {
 
 		List<Integer> stats = Arrays.asList(1,2,3);
 
 		when(dependency.retrieveAllStats()).thenReturn(stats);
 		
-		PowerMockito.mockStatic(UtilityClass.class);
-
-		when(UtilityClass.staticMethod(6)).thenReturn(150);
+		long result = Whitebox.invokeMethod(systemUnderTest, "privateMethodUnderTest");
 		
-		int result = systemUnderTest.methodCallingAStaticMethod();
+		assertEquals(6, result);
 		
-		assertEquals(150, result);
-		
-		PowerMockito.verifyStatic();
-		UtilityClass.staticMethod(6);
 		
 	}
 
